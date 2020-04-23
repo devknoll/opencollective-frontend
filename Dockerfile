@@ -45,16 +45,25 @@ RUN npm prune --production
 
 EXPOSE $PORT
 
+RUN find /usr/src/frontend/dist/ -type f -exec gzip -k9 {} \;
+
 CMD echo "\
 events {}\n\
 http {\n\
   include mime.types;\n\
   server { \n\
     listen $PORT;\n\
+    gzip_static on;\n\
+    gzip_vary on;\n\
+    gzip_proxied any;\n\
     location /static {\n\
+      sendfile on;\n\
+      tcp_nopush on;\n\
       alias /usr/src/frontend/dist/public/static;\n\
     }\n\
     location /_next/static {\n\
+      sendfile on;\n\
+      tcp_nopush on;\n\
       alias /usr/src/frontend/dist/.next/static;\n\
     }\n\
     location / {\n\
@@ -62,4 +71,4 @@ http {\n\
     }\n\
   }\n\
 }\
-" > /etc/nginx/nginx.conf && nginx && PORT=4321 npm run start
+" > /etc/nginx/nginx.conf && mkdir -p -m 755 /var/log/nginx/ && nginx && PORT=4321 npm run start
