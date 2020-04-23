@@ -1,3 +1,4 @@
+// Foo
 const debug = require('debug');
 const dotenv = require('dotenv');
 
