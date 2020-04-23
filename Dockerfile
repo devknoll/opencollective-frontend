@@ -1,5 +1,9 @@
 FROM node:12.13
 
+RUN \
+  apt update && \
+  apt-get install -y nginx socat
+
 WORKDIR /usr/src/frontend
 
 # Skip Cypress Install
@@ -41,4 +45,21 @@ RUN npm prune --production
 
 EXPOSE $PORT
 
-CMD [ "npm", "run", "start" ]
+CMD echo "\
+events {}\n\
+http {\n\
+  include mime.types;\n\
+  server { \n\
+    listen $PORT;\n\
+    location /static {\n\
+      alias /usr/src/frontend/dist/public/static;\n\
+    }\n\
+    location /_next/static {\n\
+      alias /usr/src/frontend/dist/.next/static;\n\
+    }\n\
+    location / {\n\
+      proxy_pass http://127.0.0.1:4321;\n\
+    }\n\
+  }\n\
+}\
+" > /etc/nginx/nginx.conf && nginx && PORT=4321 npm run start
