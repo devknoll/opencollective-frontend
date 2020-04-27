@@ -60,11 +60,13 @@ http {\n\
       sendfile on;\n\
       tcp_nopush on;\n\
       alias /usr/src/frontend/dist/public/static;\n\
+      add_header Cache-Control \"public\";\n\
     }\n\
     location /_next/static {\n\
       sendfile on;\n\
       tcp_nopush on;\n\
       alias /usr/src/frontend/dist/.next/static;\n\
+      add_header Cache-Control \"public\";\n\
     }\n\
     location / {\n\
       proxy_pass http://127.0.0.1:4321;\n\
